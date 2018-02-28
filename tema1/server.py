@@ -21,7 +21,7 @@ def receive_file_stream_mode(client_socket:socket.socket, args):
 
     file_name = client_socket.recv(file_name_size)
     file_name = file_name.decode("utf-8")
-    print("start reveiving {}".format(file_name))
+    print("start receiving {}".format(file_name))
 
     with open(os.path.join(os.curdir,file_name),'wb')as f:
         while True:
@@ -45,7 +45,42 @@ def receive_file_stream_mode(client_socket:socket.socket, args):
 
 
 
-def receive_file_send_and_wait_mode(client_socket:socket.socket):
+def receive_file_send_and_wait_mode(client_socket:socket.socket, args):
+    total_bytes_received = 0
+    total_messages_received = 0
+
+    file_name_size = client_socket.recv(4)
+    file_name_size = struct.unpack('i', file_name_size)[0]
+
+    file_name = client_socket.recv(file_name_size)
+    file_name = file_name.decode("utf-8")
+    print("start receiving {}".format(file_name))
+
+    with open(os.path.join(os.curdir, file_name), 'wb')as f:
+        while True:
+            message = client_socket.recv(BLOCK_SIZE)
+            if not message:
+                break
+
+            f.write(message)
+            print("Received {} bytes".format(len(message)))
+
+            total_messages_received += 1
+            total_bytes_received += len(message)
+
+    #         Send Ack
+            ACK = total_bytes_received + 1
+            ACK_bytes = struct.pack("Q", ACK)
+            client_socket.send(ACK_bytes)
+            print("sent ack {}".format(ACK))
+
+    print("Done receiving file")
+    client_socket.close()
+
+    print("Protocol: {}".format(args.conn_type))
+    print("Total number of messages received: {}".format(total_messages_received))
+    print("Total number of bytes received: {}".format(total_bytes_received))
+
     pass
 
 
@@ -62,10 +97,12 @@ def handle_client_connection(client_socket:socket.socket, args):
     if transfer_mode == STREAMING_MODE:
         print("Start to receive in {} mode".format("streaming"))
         receive_file_stream_mode(client_socket, args)
-    else:
+    elif transfer_mode == SEND_AND_WAIT_MODE:
         print("Start to receive in {} mode".format("send_and_wait"))
-
-    pass
+        receive_file_send_and_wait_mode(client_socket, args)
+    else:
+        print("{} uknowk or unsupported send-receive protocol".format(transfer_mode));
+        pass
 
 
 
