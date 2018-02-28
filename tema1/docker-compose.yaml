@@ -1,0 +1,45 @@
+version: '3'
+services:
+  web_tcp_1:
+    environment:
+      - PYTHONUNBUFFERED=0
+      - CONN_TYPE=TCP
+    build: .
+
+  web_tcp_2:
+    environment:
+      - CONN_TYPE=TCP
+      - PYTHONUNBUFFERED=0
+    build: .
+
+  web_udp_1:
+    environment:
+      - CONN_TYPE=UDP
+      - PYTHONUNBUFFERED=0
+    build: .  
+
+  web_udp_2:
+    environment:
+      - CONN_TYPE=UDP
+      - PYTHONUNBUFFERED=0
+    build: .
+
+  lb_tcp:
+    image: 'nginx'
+    links:
+      - web_tcp_1
+      - web_tcp_2
+    ports:
+      - '80:80'
+    volumes:
+      - ./nginx/nginx_tcp.conf:/etc/nginx/nginx.conf:ro
+
+  lb_upd:
+    image: 'nginx'
+    links:
+      - web_udp_1
+      - web_udp_2
+    ports:
+      - '81:80'
+    volumes:
+      - ./nginx/nginx_udp.conf:/etc/nginx/nginx.conf:ro
