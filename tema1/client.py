@@ -8,7 +8,7 @@ import string
 
 STREAMING_MODE = 0
 SEND_AND_WAIT_MODE = 1
-BLOCK_SIZE = 1024
+BLOCK_SIZE = 4096
 
 
 # def random_generator(size, chars=string.ascii_uppercase + string.digits):
@@ -143,7 +143,7 @@ def nice_time(millis):
 
 
 if __name__ == "__main__":
-    file_path = "/home/vasile/Desktop/javascript_book.tar.xz"
+    file_path = "../../overlord.mkv"
     parser = argparse.ArgumentParser(description='Client homework1.')
     parser.add_argument("-c", "--conn_type", type=str, help="connection type can be TCP or UDP", required=True)
     parser.add_argument("-ip", "--ip_address", type=str, help="ip adress of server", required=True)

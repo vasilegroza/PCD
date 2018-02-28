@@ -6,7 +6,7 @@ import os
 
 STREAMING_MODE=0
 SEND_AND_WAIT_MODE=1
-BLOCK_SIZE = 1024
+BLOCK_SIZE = 4096
 
 
 bind_ip = '0.0.0.0'
